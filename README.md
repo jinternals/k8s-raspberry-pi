@@ -1,5 +1,7 @@
 # Setup k8s cluster - raspberry-pi 
 
+![Cluster Image](docs/cluster.jpg)
+
 ### Install k3s
 ```shell
 ansible-playbook -i hosts playbook/k3s/k3s.yml
