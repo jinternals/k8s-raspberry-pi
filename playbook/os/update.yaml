@@ -1,0 +1,21 @@
+---
+- name: update all the hosts
+  hosts: k3s_servers, k3s_agents
+  become: yes
+
+  tasks:
+    - name: Run apt-get update
+      apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Update all packages to the latest version
+      apt:
+        upgrade: full
+      register: apt_update_status
+
+    - name: Reboot when packages were updated
+      reboot:
+        post_reboot_delay: 60
+      when: apt_update_status.changed
+

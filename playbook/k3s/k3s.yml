@@ -1,0 +1,137 @@
+---
+- name: Setup baseline for all k3s nodes
+  hosts: k3s_servers, k3s_agents
+  vars:
+    boot_file: /boot/cmdline.txt
+  tasks:
+    - name: Check if cgroups are set correctly
+      become: yes
+      shell: grep -c 'cgroup_memory=1 cgroup_enable=memory' '{{ boot_file }}' | cat
+      register: cmdline
+      ignore_errors: yes
+
+    - name: Ensure cgroups are correctly set by updating raspberry pi
+      become: yes
+      ansible.builtin.lineinfile:
+        state: present
+        backrefs: yes
+        path: '{{ boot_file }}'
+        regexp: '(.+)(?!cgroup_memory=1 cgroup_enable=memory)'
+        line: '\1 cgroup_memory=1 cgroup_enable=memory'
+      when: cmdline.stdout == "0"
+
+    - name: Disable swap with dphys-swapfile
+      become: yes
+      shell: dphys-swapfile swapoff && dphys-swapfile uninstall && update-rc.d dphys-swapfile remove
+
+    - name: Disable dphys-swapfile service
+      become: yes
+      systemd:
+        name: dphys-swapfile
+        enabled: no
+      register: swapfile_service
+
+    - name: Reboot host if system settings were updated
+      become: yes
+      ansible.builtin.reboot:
+        reboot_timeout: 3600
+      when: cmdline.stdout == "0" or swapfile_service.changed
+
+- name: Setup k3s servers
+  hosts: k3s_servers
+  tasks:
+    - name: Check if k3s is already installed
+      ansible.builtin.stat:
+        path: /usr/local/bin/k3s
+      register: k3s
+
+    - name: Install k3s on server
+      become: yes
+      shell: curl -sfL https://get.k3s.io | sh -
+      environment:
+        K3S_NODE_NAME: "{{ inventory_hostname }}"
+        INSTALL_K3S_EXEC: "--disable servicelb --disable traefik --node-taint CriticalAddonsOnly=true:NoExecute"
+      when: not k3s.stat.exists
+
+    - name: Get node join token
+      become: yes
+      ansible.builtin.fetch:
+        src: /var/lib/rancher/k3s/server/token
+        dest: 'node_join_token'
+        flat: yes
+
+- name: Setup k3s agents
+  hosts: k3s_agents
+  tasks:
+    - name: Check if k3s is already installed
+      ansible.builtin.stat:
+        path: /usr/local/bin/k3s
+      register: k3s
+
+    - name: Extract k3s server node token from control node
+      local_action:
+        module: shell
+        cmd: cat node_join_token
+      register: node_join_token
+
+    - name: Install k3s on agent
+      become: yes
+      shell: curl -sfL https://get.k3s.io | sh -
+      environment:
+        K3S_TOKEN: "{{ node_join_token.stdout }}"
+        # Select the first host in the group of k3s servers as the server for the agent
+        K3S_URL: "https://{{ groups['k3s_servers'] | first }}:6443"
+        K3S_NODE_NAME: "{{ inventory_hostname }}"
+      when: not k3s.stat.exists
+
+
+- name: Wait for all nodes to complete their registration
+  hosts: k3s_servers
+  vars:
+    total_amount_of_nodes: "{{ groups['k3s_servers'] | count + groups['k3s_agents'] | count }}"
+  tasks:
+    - name: Wait until all agents are registered
+      become: yes
+      shell: k3s kubectl get nodes --no-headers | wc -l
+      until: agents.stdout | int == total_amount_of_nodes | int
+      register: agents
+      retries: 10
+      delay: 10
+
+    - name: Copy kubectl config from server to temp .kube directory on control node
+      become: yes
+      ansible.builtin.fetch:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: .kube/config
+        flat: yes
+
+- name: Setup kubectl on control node with new context
+  hosts: localhost
+  tasks:
+    - name: Create $HOME/Installed/k8s/pi/ directory if not present
+      ansible.builtin.file:
+        path: $HOME/Installed/k8s/pi/
+        state: directory
+
+    - name: Replace the server reference in k3s kube config with IP of a server node
+      ansible.builtin.replace:
+        path: .kube/config
+        regexp: '127\.0\.0\.1'
+        replace: "{{ groups['k3s_servers'] | first }}"
+        backup: yes
+
+    - name: Copy k3s kube config to $HOME/Installed/k8s/pi/ directory
+      ansible.builtin.copy:
+        src: .kube/config
+        dest: $HOME/Installed/k8s/pi/
+        mode: '600'
+
+    - name: Remove node join token
+      ansible.builtin.file:
+        path: node_join_token
+        state: absent
+
+    - name: Remove temporary kube config directory
+      ansible.builtin.file:
+        path: .kube
+        state: absent

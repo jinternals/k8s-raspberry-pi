@@ -1,0 +1,9 @@
+---
+- name: update all the hosts
+  hosts: k3s_servers, k3s_agents
+  become: yes
+
+  tasks:
+    - name: Shutdown Nodes
+      command: /sbin/shutdown -h now
+      when: ansible_facts['os_family'] == "Debian"
