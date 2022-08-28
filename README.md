@@ -1,4 +1,4 @@
-# Setup raspberry-pi k8s cluster
+# Setup k8s cluster - raspberry-pi 
 
 ### Install k3s
 ```shell
