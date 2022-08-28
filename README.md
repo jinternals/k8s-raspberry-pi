@@ -2,6 +2,14 @@
 
 ![Cluster Image](docs/cluster.jpg)
 
+Hardware:
+  - [6 x raspberry pic 4B 8GB](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/)
+  - [1 x 8-Port Gigabit Easy Smart Switch ](https://www.tp-link.com/in/business-networking/easy-smart-switch/tl-sg108e/v6/)
+  - [1 x AC750 Wireless Travel Router](https://www.tp-link.com/in/home-networking/wifi-router/tl-wr902ac/)
+  - [7 x 1FT CAT 6 Patch C Cables](https://www.amazon.in/gp/product/B005RCG0FK/ref=ppx_yo_dt_b_asin_title_o01_s00?ie=UTF8&psc=1)
+  - [1 x Anker Power Port 6 (60W)](https://www.crazypi.com/raspberry-pi-cluster-power-supply-60w)
+  - [Hoteon Power Strip plus + Cable Management Box](https://www.amazon.in/gp/product/B094NDJGYL/ref=ppx_yo_dt_b_asin_title_o03_s00?ie=UTF8&psc=1)
+  
 ### Install k3s
 ```shell
 ansible-playbook -i hosts playbook/k3s/k3s.yml
