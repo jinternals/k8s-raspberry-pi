@@ -72,10 +72,6 @@ kubectl expose deployment rancher -n cattle-system --type=LoadBalancer --name=ra
 ```
 
 
-```shell
-
-```
-
 
 ### Blogs:
 
