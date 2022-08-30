@@ -77,3 +77,4 @@ kubectl expose deployment rancher -n cattle-system --type=LoadBalancer --name=ra
 
   - https://banzaicloud.com/blog/load-balancing-on-prem/
   - https://fredrickb.com/2021/08/22/recreating-the-raspberry-pi-homelab-with-kubernetes/
+  - https://tothecloud.dev/using-certmanager-with-cloudflare-and-kubernetes/
