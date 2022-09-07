@@ -19,8 +19,8 @@ ansible-playbook -i hosts playbook/k3s/k3s.yml
 ### 1. Install metallb
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.11.0/manifests/namespace.yaml
-kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.11.0/manifests/metallb.yaml
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/namespace.yaml
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/metallb.yaml
 kubectl apply -f apps/metallb/config.yaml
 ```
 
@@ -28,7 +28,6 @@ kubectl apply -f apps/metallb/config.yaml
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/baremetal/deploy.yaml
-
 ```
 
 ```shell
@@ -38,7 +37,6 @@ replace NodePort to LoadBalancer
 
 ### 3. Install cert-manager
 ```shell
-kubectl apply -f apps/ingress_class.yaml
 helm repo add jetstack https://charts.jetstack.io
 ```
 
@@ -51,27 +49,54 @@ helm install \
   --set installCRDs=true
 ```
 
-
-### 4. Install rancher
-
-```shell
-helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
+=======
+### SSL certs setup 
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cloudflare-api-token-secret
+  namespace: cert-manager
+type: Opaque
+data:
+  api-token: ZWRhNjY5ZTE4N2MwOWNjNTliYWE1NjZjZTFiNmEzMzMzYmE5Mg==
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    email: pandeymradul@gmail.com
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    solvers:
+      - dns01:
+          cloudflare:
+            email: pandeymradul@gmail.com
+            apiKeySecretRef:
+              name: cloudflare-api-token-secret
+              key: api-token
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: <your-email>
+spec:
+  acme:
+    email: pandeymradul@gmail.com
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-stating
+    solvers:
+      - dns01:
+          cloudflare:
+            email: <your-email>
+            apiKeySecretRef:
+              name: cloudflare-api-token-secret
+              key: api-token
 ```
-
-```shell
-kubectl create namespace cattle-system
-
-helm install rancher rancher-latest/rancher \
-    --namespace cattle-system \
-    --set hostname=rancher.homelab.com \
-    --set bootstrapPassword=admin
-    
-    
-kubectl expose deployment rancher -n cattle-system --type=LoadBalancer --name=rancher-lb --port=443
-    
-```
-
-
 
 ### Blogs:
 

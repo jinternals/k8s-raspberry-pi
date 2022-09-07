@@ -1,6 +1,6 @@
 ---
 - name: update all the hosts
-  hosts: k3s_servers, k3s_agents
+  hosts: k3s_servers, k3s_agents, lab_servers
   become: yes
 
   tasks:

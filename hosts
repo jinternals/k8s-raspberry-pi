@@ -7,9 +7,12 @@
 192.168.0.123
 192.168.0.124
 192.168.0.125
-
-[k3s_ngnix]
 192.168.0.126
+
+[lab_servers]
+192.168.0.131
+192.168.0.132
+192.168.0.133
 
 [k3s_servers:vars]
 ansible_user=pi
@@ -17,5 +20,5 @@ ansible_user=pi
 [k3s_agents:vars]
 ansible_user=pi
 
-[k3s_ngnix:vars]
+[lab_servers:vars]
 ansible_user=pi
