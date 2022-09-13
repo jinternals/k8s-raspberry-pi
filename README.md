@@ -59,7 +59,7 @@ metadata:
   namespace: cert-manager
 type: Opaque
 data:
-  api-token: ZWRhNjY5ZTE4N2MwOWNjNTliYWE1NjZjZTFiNmEzMzMzYmE5Mg==
+  api-token: <token>
 ---
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -67,14 +67,14 @@ metadata:
   name: letsencrypt-prod
 spec:
   acme:
-    email: pandeymradul@gmail.com
+    email: <your-email>
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       name: letsencrypt-prod
     solvers:
       - dns01:
           cloudflare:
-            email: pandeymradul@gmail.com
+            email: <your-email>
             apiKeySecretRef:
               name: cloudflare-api-token-secret
               key: api-token
@@ -98,6 +98,11 @@ spec:
               key: api-token
 ```
 
+```shell
+ansible-playbook -i hosts playbook/longhorn/longhorn.yaml
+
+kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/master/deploy/longhorn.yaml
+```
 ### Blogs:
 
   - https://banzaicloud.com/blog/load-balancing-on-prem/

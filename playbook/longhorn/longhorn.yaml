@@ -1,0 +1,17 @@
+---
+- name: Setup baseline for all k3s nodes
+  hosts: k3s_servers, k3s_agents
+  tasks:
+    - name: Update APT package manager repositories cache
+      become: true
+      apt:
+        update_cache: yes
+
+    - name: Install packages using ansible
+      become: true
+      apt:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+          - open-iscsi

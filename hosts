@@ -9,10 +9,15 @@
 192.168.0.125
 192.168.0.126
 
-[lab_servers]
-192.168.0.131
-192.168.0.132
-192.168.0.133
+[zookeeper-nodes]
+server-1.local zookeeper_id=1
+server-2.local zookeeper_id=2
+server-3.local zookeeper_id=3
+
+[kafka-nodes]
+server-1.local
+server-2.local
+server-3.local
 
 [k3s_servers:vars]
 ansible_user=pi
@@ -20,5 +25,8 @@ ansible_user=pi
 [k3s_agents:vars]
 ansible_user=pi
 
-[lab_servers:vars]
+[zookeeper-nodes:vars]
+ansible_user=pi
+
+[kafka-nodes:vars]
 ansible_user=pi
