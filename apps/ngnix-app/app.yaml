@@ -50,11 +50,11 @@ metadata:
 spec:
   tls:
     - hosts:
-        - homelabs.co.in
-      secretName: homelabs
+        - <your-host>
+      secretName: <your-host-secret>
   ingressClassName: nginx
   rules:
-    - host: homelabs.co.in
+    - host: <your-host>
       http:
         paths:
           - path: /nginx
