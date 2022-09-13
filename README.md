@@ -85,7 +85,7 @@ metadata:
   name: <your-email>
 spec:
   acme:
-    email: pandeymradul@gmail.com
+    email: <your-email>
     server: https://acme-staging-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       name: letsencrypt-stating
