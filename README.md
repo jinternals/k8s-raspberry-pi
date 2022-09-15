@@ -10,6 +10,10 @@ Hardware:
   - [1 x Anker Power Port 6 (60W)](https://www.crazypi.com/raspberry-pi-cluster-power-supply-60w)
   - [Raspberry Pi Cluster 6 Layer Rack](https://www.crazypi.com/raspberry-pi-cluster-6-layer?search=cluster&description=true)
   - [Hoteon Power Strip plus + Cable Management Box](https://www.amazon.in/gp/product/B094NDJGYL/ref=ppx_yo_dt_b_asin_title_o03_s00?ie=UTF8&psc=1)
+
+### Architecture: 
+  
+  https://miro.com/app/board/uXjVPcUEQXI=/?share_link_id=642944915070
   
 ### Install k3s
 ```shell
