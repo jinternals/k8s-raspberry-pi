@@ -1,6 +1,6 @@
 # Setup k8s cluster - raspberry-pi 
 
-![Cluster Image](docs/IMG_7802.HEIC)
+![Cluster Image](docs/cluster.jpg)
 
 Hardware:
   - [6 x raspberry pic 4B 8GB](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/)
