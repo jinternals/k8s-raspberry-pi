@@ -15,12 +15,12 @@ Hardware:
   
   https://miro.com/app/board/uXjVPcUEQXI=/?share_link_id=642944915070
   
-### Install k3s
+### 1. Install k3s
 ```shell
 ansible-playbook -i hosts playbook/k3s/k3s.yml
 ```
 
-### 1. Install metallb
+### 2. Install metallb
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/namespace.yaml
@@ -28,7 +28,7 @@ kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manif
 kubectl apply -f apps/metallb/config.yaml
 ```
 
-### 2. install Ingress-nginx
+### 3. install Ingress-nginx
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/baremetal/deploy.yaml
@@ -39,7 +39,7 @@ edit ingress-nginx-controller
 replace NodePort to LoadBalancer
 ```
 
-### 3. Install cert-manager
+### 4. Install cert-manager
 ```shell
 helm repo add jetstack https://charts.jetstack.io
 ```
