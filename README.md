@@ -23,8 +23,7 @@ ansible-playbook -i hosts playbook/k3s/k3s.yml
 ### 2. Install metallb
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/namespace.yaml
-kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/metallb.yaml
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.3/config/manifests/metallb-native.yaml
 kubectl apply -f apps/metallb/config.yaml
 ```
 
@@ -41,20 +40,10 @@ replace NodePort to LoadBalancer
 
 ### 4. Install cert-manager
 ```shell
-helm repo add jetstack https://charts.jetstack.io
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.4/cert-manager.yaml
 ```
 
-```shell
-helm install \
-  cert-manager jetstack/cert-manager \
-  --namespace cert-manager \
-  --create-namespace \
-  --version v1.9.1 \
-  --set installCRDs=true
-```
-
-=======
-### SSL certs setup 
+#### Setup SSL cert issuer 
 ```yaml
 apiVersion: v1
 kind: Secret
@@ -102,6 +91,8 @@ spec:
               key: api-token
 ```
 
+### Setup Longhorn:
+
 ```shell
 ansible-playbook -i hosts playbook/longhorn/longhorn.yaml
 
@@ -112,3 +103,22 @@ kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/master/depl
   - https://banzaicloud.com/blog/load-balancing-on-prem/
   - https://fredrickb.com/2021/08/22/recreating-the-raspberry-pi-homelab-with-kubernetes/
   - https://tothecloud.dev/using-certmanager-with-cloudflare-and-kubernetes/
+
+
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm install prometheus prometheus-community/kube-prometheus-stack
+
+### Deploy Metrics Server
+```shell
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml           
+```
+
+### Deploy Dashboard
+```shell
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+
+kubectl apply -f apps/dashboard/service-account.yml
+
+kubectl create token admin-user -n  kubernetes-dashboard
+```

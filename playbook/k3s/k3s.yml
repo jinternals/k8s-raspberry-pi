@@ -84,7 +84,6 @@
         K3S_NODE_NAME: "{{ inventory_hostname }}"
       when: not k3s.stat.exists
 
-
 - name: Wait for all nodes to complete their registration
   hosts: k3s_servers
   vars:

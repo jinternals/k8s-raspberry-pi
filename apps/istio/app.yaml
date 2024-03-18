@@ -1,0 +1,124 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: istio-demo
+  labels:
+    istio-injection: enabled
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-svc
+  namespace: istio-demo
+spec:
+  type: ClusterIP
+  selector:
+    app: demo-app
+  ports:
+    - port: 80
+      targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-deployment
+  namespace: istio-demo
+  labels:
+    app: demo-app
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-app
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: demo-app
+        version: v1
+    spec:
+      containers:
+        - name: demo-app
+          image: ealen/echo-server:latest
+          ports:
+            - containerPort: 80
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: k8s-gateway
+  namespace: istio-demo
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-stating
+spec:
+  gatewayClassName: istio
+  listeners:
+    - name: http-listener
+      hostname: "*.homelabs.co.in"
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: https-listener
+      hostname: "test.homelabs.co.in"
+      port: 443
+      protocol: HTTPS
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: "test-homelabs-cert"
+      allowedRoutes:
+        namespaces:
+          from: All
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: insecure-http-route
+  namespace: istio-demo
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: k8s-gateway
+      sectionName: http-listener
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      filters:
+        - type: RequestHeaderModifier
+          requestHeaderModifier:
+            add:
+              - name: HTTPRoute
+                value: insecure-http-route
+      backendRefs:
+        - name: demo-svc
+          port: 80
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: secure-http-route
+  namespace: istio-demo
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: k8s-gateway
+      sectionName: https-listener
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      filters:
+        - type: RequestHeaderModifier
+          requestHeaderModifier:
+            add:
+              - name: HTTPRoute
+                value: secure-http-route
+      backendRefs:
+        - name: demo-svc
+          port: 80

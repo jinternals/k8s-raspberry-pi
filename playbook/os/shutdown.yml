@@ -1,5 +1,5 @@
 ---
-- name: update all the hosts
+- name: Shutdown all the hosts
   hosts: k3s_servers, k3s_agents
   become: yes
 
