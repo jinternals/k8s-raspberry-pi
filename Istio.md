@@ -201,3 +201,4 @@ spec:
 
 ### 7. Demo Output
 ![istio-demo.png](images%2Fistio-demo.png)
+![kiali.png](images%2Fkiali.png)
