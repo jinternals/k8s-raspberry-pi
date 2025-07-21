@@ -23,7 +23,7 @@ ansible-playbook -i hosts playbook/k3s/k3s.yml
 ### 2. Install metallb
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.3/config/manifests/metallb-native.yaml
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.15.2/config/manifests/metallb-native.yaml
 kubectl apply -f apps/metallb/config.yaml
 ```
 
@@ -40,7 +40,7 @@ replace NodePort to LoadBalancer
 
 ### 4. Install cert-manager
 ```shell
-kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.4/cert-manager.yaml
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.18.2/cert-manager.yaml
 ```
 
 #### Setup SSL cert issuer 

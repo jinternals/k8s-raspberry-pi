@@ -3,9 +3,10 @@
 
 ### 1. Install the Gateway API CRDs and Install Istio using the minimal profile
 ```shell
-kubectl get crd gateways.gateway.networking.k8s.io &> /dev/null || \
-  { kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=444631bfe06f3bcca5d0eadf1857eac1d369421d" | kubectl apply -f -; }
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml
+```
 
+```shell
 istioctl install --set profile=minimal -y
 ```
 ### 2. Install Istio addons
@@ -16,7 +17,7 @@ kubectl apply -f ~/istio-1.21.0/samples/addons/
 
 ### 3. Install cert-manager
 ```shell
-kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.4/cert-manager.yaml
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.18.2/cert-manager.yaml
 ```
 ### 4. Enable ExperimentalGatewayAPISupport in  cert-manager-controller:
 
