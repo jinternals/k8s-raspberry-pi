@@ -1,0 +1,47 @@
+# LAN-only Gateway for admin dashboards (plain HTTP, no hostname, no TLS).
+#
+# Dashboards log in with admin tokens (Headlamp) or have no login at all (Longhorn),
+# so they get their own Gateway and IP (192.168.0.201) instead of the public one
+# (192.168.0.200). Change the IP to a free address in your MetalLB pool.
+#
+# | Listener | Port | Routes from     | App      | URL from the cluster LAN   |
+# |----------|------|-----------------|----------|----------------------------|
+# | http     | 80   | kube-system     | Headlamp | http://192.168.0.201       |
+# | longhorn | 8081 | longhorn-system | Longhorn | http://192.168.0.201:8081  |
+#
+# Only use on a trusted network. Never expose these ports to the internet.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: internal-gateway
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: internal-gateway
+  namespace: internal-gateway
+spec:
+  gatewayClassName: nginx
+  infrastructure:
+    annotations:
+      # Copied by NGINX Gateway Fabric onto the generated LoadBalancer Service
+      metallb.io/loadBalancerIPs: 192.168.0.201
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+    - name: longhorn
+      port: 8081
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: longhorn-system

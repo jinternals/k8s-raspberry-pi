@@ -1,0 +1,23 @@
+# Headlamp on the LAN-only internal Gateway (apps/internal-gateway/gateway.yaml), listener "http".
+#   From the cluster LAN: http://192.168.0.201
+#   From another local network: port-forward 8080 -> 192.168.0.201:80 on the router in front of the cluster
+#
+# Prerequisite: Headlamp Helm release "headlamp" in kube-system (README).
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: headlamp
+  namespace: kube-system
+spec:
+  parentRefs:
+    - name: internal-gateway
+      namespace: internal-gateway
+      sectionName: http
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: headlamp
+          port: 80
