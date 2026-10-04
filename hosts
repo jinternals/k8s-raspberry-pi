@@ -2,15 +2,20 @@
 192.168.0.100
 
 [k3s_agents]
-192.168.0.121
-192.168.0.122
-192.168.0.123
-192.168.0.124
-192.168.0.125
-192.168.0.126
+192.168.0.101
+192.168.0.102
+192.168.0.103
+192.168.0.104
+192.168.0.105
+192.168.0.106
 
 [k3s_servers:vars]
 ansible_user=pi
 
 [k3s_agents:vars]
 ansible_user=pi
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3
+
+[lab_servers]

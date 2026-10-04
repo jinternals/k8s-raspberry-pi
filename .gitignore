@@ -33,3 +33,9 @@ build/
 .vscode/
 .DS_Store
 /**/*.DS_Store
+
+### Ansible k3s playbook temp files ###
+node_join_token
+.kube/
+playbook/**/node_join_token
+playbook/**/.kube/

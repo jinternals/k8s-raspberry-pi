@@ -1,17 +1,40 @@
 ---
-- name: Setup baseline for all k3s nodes
+- name: Setup Longhorn prerequisites for all k3s nodes
   hosts: k3s_servers, k3s_agents
+  become: true
   tasks:
     - name: Update APT package manager repositories cache
-      become: true
       apt:
         update_cache: yes
 
-    - name: Install packages using ansible
-      become: true
+    - name: Install packages required by Longhorn
       apt:
         name: "{{ packages }}"
         state: present
       vars:
         packages:
-          - open-iscsi
+          - open-iscsi     # volume attachment
+          - nfs-common     # RWX volumes and NFS backups
+          - cryptsetup     # encrypted volumes
+          - dmsetup
+
+    - name: Load kernel modules now
+      community.general.modprobe:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - iscsi_tcp
+        - dm_crypt
+
+    - name: Load kernel modules on boot
+      copy:
+        dest: /etc/modules-load.d/longhorn.conf
+        content: |
+          iscsi_tcp
+          dm_crypt
+
+    - name: Enable and start iscsid
+      systemd:
+        name: iscsid
+        enabled: true
+        state: started

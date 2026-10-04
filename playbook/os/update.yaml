@@ -4,14 +4,16 @@
   become: yes
 
   tasks:
-    - name: Run apt-get update
+    - name: Refresh apt cache
       apt:
         update_cache: true
-        cache_valid_time: 3600
+        cache_valid_time: 0
 
-    - name: Update all packages to the latest version
+    - name: Full upgrade all packages
       apt:
         upgrade: full
+        autoremove: true
+        autoclean: true
       register: apt_update_status
 
     - name: Reboot when packages were updated
